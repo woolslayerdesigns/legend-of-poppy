@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Legend of Poppy</title>
+    <style>
+        body { 
+            margin: 0; background: #050515; color: white; 
+            font-family: 'Arial Black', sans-serif; overflow: hidden; touch-action: none; cursor: none; 
+        }
+        
+        #bat-cursor {
+            position: fixed; width: 14px; height: 100px;
+            background: linear-gradient(to bottom, #deb887, #8b4513);
+            border-radius: 6px; pointer-events: none; z-index: 1000;
+            transform: rotate(-45deg); box-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+            margin-left: -7px; margin-top: -50px;
+        }
+
+        .screen {
+            position: absolute; width: 100%; height: 100%; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            background: radial-gradient(circle, #1a1a4a 0%, #050515 100%); z-index: 100; text-align: center;
+            padding: 20px; box-sizing: border-box;
+        }
+        #game-container { position: relative; width: 100vw; height: 100vh; display: none; }
+        
+        .bat-wrapper {
+            position: absolute; width: 160px; height: 120px;
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+        }
+        .enemy {
+            width: 90px; height: 55px;
+            background: #444; clip-path: polygon(0% 50%, 25% 0%, 50% 50%, 75% 0%, 100% 50%, 50% 100%);
+        }
+        
+        .poo {
+            position: absolute; width: 22px; height: 16px; background: #5d4037;
+            border-radius: 50%; z-index: 5; animation: drop 0.3s ease-in forwards;
+        }
+        @keyframes drop { 0% { transform: translateY(-50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+        .bam {
+            position: absolute; color: #ffea00; font-size: 2.8rem; font-weight: 900;
+            text-shadow: 3px 3px #ff0000; z-index: 20; pointer-events: none;
+            animation: impact 0.4s ease-out forwards;
+        }
+        @keyframes impact { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        #family-zone {
+            position: absolute; bottom: 30px; width: 90%; left: 5%; height: 130px;
+            border: 5px solid white; border-radius: 25px; display: flex;
+            justify-content: space-around; align-items: center; background: rgba(255,255,255,0.1);
+        }
+        .member { text-align: center; transition: transform 0.2s; }
+        .member span { font-size: 4rem; display: block; }
+        .btn { background: #ffea00; color: #000; padding: 20px 50px; font-size: 2rem; border-radius: 15px; border: none; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        
+        .intro-text { font-size: 1.2rem; line-height: 1.6; max-width: 600px; margin: 20px auto; color: #ddd; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+
+<div id="bat-cursor"></div>
+
+<div id="start-screen" class="screen">
+    <h1 style="font-size: 3.5rem; margin-bottom: 0; color: #ffea00;">THE LEGEND OF POPPY</h1>
+    <h2 style="font-size: 1.5rem; margin-top: 0; color: #fff;">Poppy or Poopy?</h2>
+    
+    <div class="intro-text">
+        In 1985, a darkness fell over Grobmeyer Drive. A winged menace invaded the attic, and almost no one survived the terror... except for <b>Poppy</b>. He saved the day with a single bat and nerves of steel. Now, the bats are back. <b>How will you do?</b>
+    </div>
+    
+    <p style="font-size: 1.3rem; color: #ffea00; margin-bottom: 10px;">Splat the Bats to save DeeDee and the boys!</p>
+    <button class="btn" onclick="startGame()">START MISSION</button>
+</div>
+
+<div id="end-screen" class="screen" style="display:none;">
+    <h1 id="res-title" style="font-size: 3rem;"></h1>
+    <h2 id="res-score" style="font-size: 2.2rem; color: #ffea00;"></h2>
+    <p id="res-msg" style="font-size: 1.4rem; margin-top: 10px; font-weight: bold;"></p>
+    <button class="btn" onclick="location.reload()">REPLAY THE LEGEND</button>
+</div>
+
+<div id="game-container">
+    <div style="padding: 25px; display: flex; justify-content: space-between; font-size: 2rem; font-weight: bold;">
+        <div>SPLATS: <span id="score">0</span>/50</div>
+        <div id="health-ui" style="color: #ffea00;">GUANO LEVEL: 0%</div>
+    </div>
+
+    <div id="family-zone">
+        <div class="member" id="m0"><span>👩</span>DeeDee</div>
+        <div class="member" id="m1"><span>👦</span>Jeff</div>
+        <div class="member" id="m2"><span>👦</span>Brandon</div>
+    </div>
+</div>
+
+<script>
+    let score = 0, guano = 0, spawned = 0, finished = 0, active = false;
+    const total = 50;
+    const words = ["BAM!", "POW!", "SPLAT!", "WHAM!", "CRACK!"];
+
+    function sync(e) {
+        const x = e.touches ? e.touches[0].clientX : e.clientX;
+        const y = e.touches ? e.touches[0].clientY : e.clientY;
+        const cur = document.getElementById('bat-cursor');
+        cur.style.left = x + 'px';
+        cur.style.top = y + 'px';
+    }
+    document.addEventListener('mousemove', sync);
+    document.addEventListener('touchstart', sync);
+    document.addEventListener('touchmove', sync);
+
+    function startGame() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        active = true;
+        loop();
+    }
+
+    function loop() {
+        if (spawned < total && active) {
+            spawned++;
+            create();
+            let delay = Math.max(350, 1100 - (spawned * 18));
+            setTimeout(loop, delay);
+        }
+    }
+
+    function create() {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bat-wrapper';
+        const b = document.createElement('div');
+        b.className = 'enemy';
+        
+        let startX = Math.random() * (window.innerWidth - 160);
+        wrapper.style.left = startX + 'px';
+        wrapper.style.top = '-120px';
+        wrapper.appendChild(b);
+        document.getElementById('game-container').appendChild(wrapper);
+
+        const splat = (e) => {
+            if (e && e.cancelable) e.preventDefault();
+            if (wrapper.dataset.hit) return;
+            wrapper.dataset.hit = true;
+            score++;
+            document.getElementById('score').innerText = score;
+            const p = document.createElement('div');
+            p.className = 'bam';
+            p.innerText = words[Math.floor(Math.random()*words.length)];
+            p.style.left = wrapper.style.left;
+            p.style.top = wrapper.style.top;
+            document.getElementById('game-container').appendChild(p);
+            wrapper.remove();
+            done();
+            setTimeout(() => p.remove(), 400);
+        };
+
+        wrapper.addEventListener('mouseover', splat); 
+        wrapper.addEventListener('touchstart', splat);
+        wrapper.addEventListener('mousedown', splat);
+
+        let s = 4 + (spawned / 11);
+        let f = setInterval(() => {
+            if (!active) { clearInterval(f); return; }
+            let t = parseFloat(wrapper.style.top);
+            wrapper.style.top = (t + s) + 'px';
+
+            if (t > window.innerHeight - 200) {
+                clearInterval(f);
+                if (!wrapper.dataset.hit) {
+                    guano += 10;
+                    document.getElementById('health-ui').innerText = "GUANO LEVEL: " + guano + "%";
+                    
+                    const poo = document.createElement('div');
+                    poo.className = 'poo';
+                    poo.style.left = (startX + 70) + 'px';
+                    poo.style.bottom = '160px';
+                    document.getElementById('game-container').appendChild(poo);
+                    
+                    const mid = window.innerWidth / 2;
+                    let target = "m1";
+                    if (startX < mid - 100) target = "m0";
+                    if (startX > mid + 100) target = "m2";
+                    
+                    const mem = document.getElementById(target);
+                    const old = mem.innerHTML;
+                    mem.innerHTML = "<span>🤢</span>" + old.split('</span>')[1];
+                    setTimeout(() => { mem.innerHTML = old; }, 1000);
+
+                    wrapper.remove();
+                    if (guano >= 100) over();
+                    else done();
+                }
+            }
+        }, 16);
+    }
+
+    function done() {
+        finished++;
+        if (finished >= total) setTimeout(over, 800);
+    }
+
+    function over() {
+        if (!active) return;
+        active = false;
+        document.getElementById('game-container').style.display = 'none';
+        const screen = document.getElementById('end-screen');
+        screen.style.display = 'flex';
+        
+        let rank = "";
+        let msg = "";
+        
+        if (guano === 0) {
+            rank = "POPPY THE HERO";
+            msg = "Attic Legend! 1985 would be proud.";
+        } else if (guano <= 40) {
+            rank = "THE GROBMEYER GUARDIAN";
+            msg = "Clean enough for government work!";
+        } else {
+            rank = "IT'S GUANA GET BETTER NEXT TIME";
+            msg = "Someone grab the mop!";
+        }
+        
+        document.getElementById('res-title').innerText = rank;
+        document.getElementById('res-score').innerText = "Final Splats: " + score;
+        document.getElementById('res-msg').innerText = msg;
+    }
+</script>
+</body>
+</html>
