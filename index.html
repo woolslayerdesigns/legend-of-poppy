@@ -215,16 +215,19 @@
         let rank = "";
         let msg = "";
         
-        if (guano === 0) {
-            rank = "POPPY THE HERO";
-            msg = "Attic Legend! DeeDee, Jeff, and Brandon couldn't be more proud.";
-        } else if (guano <= 40) {
-            rank = "THE BAT SPLATTER";
-            msg = "Clean enough for government work!";
-        } else {
-            rank = "IT'S GUANA GET BETTER NEXT TIME";
-            msg = "Someone grab the mop!";
-        }
+if (guano === 0) {
+    rank = "POPPY THE HERO";
+    msg = "Attic Legend! DeeDee, Jeff, and Brandon couldn't be more proud.";
+    document.getElementById("nextLevelBtn").style.display = "inline-block";
+} else if (guano <= 10) {
+    rank = "THE BAT SPLATTER";
+    msg = "Sycamore is safe! Clean enough for government work!";
+    document.getElementById("nextLevelBtn").style.display = "inline-block";
+} else {
+    rank = "IT'S GUANA GET BETTER NEXT TIME";
+    msg = "Someone grab the mop! Try Level 1 again.";
+    document.getElementById("nextLevelBtn").style.display = "none";
+}
         
         document.getElementById('res-title').innerText = rank;
         document.getElementById('res-score').innerText = "Final Splats: " + score;
