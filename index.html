@@ -136,8 +136,17 @@
         wrapper.className = 'bat-wrapper';
         
         const b = document.createElement('div');
+        let isButterfly = false;
+
         if (currentLevel === 2) {
-            b.innerText = "🐛";
+            // 20% chance to spawn a Butterfly in Level 2!
+            if (Math.random() < 0.2) {
+                isButterfly = true;
+                wrapper.dataset.butterfly = "true";
+                b.innerText = "🦋";
+            } else {
+                b.innerText = "🐛";
+            }
             b.style.fontSize = "4.5rem";
             b.style.userSelect = "none";
         } else {
@@ -154,15 +163,31 @@
             if (e && e.cancelable) e.preventDefault();
             if (wrapper.dataset.hit) return;
             wrapper.dataset.hit = true;
-            score++;
-            document.getElementById('score').innerText = score;
+
             const p = document.createElement('div');
             p.className = 'bam';
-            p.innerText = words[Math.floor(Math.random()*words.length)];
+
+            // Check if player accidentally hit a butterfly
+            if (wrapper.dataset.butterfly === "true") {
+                score = Math.max(0, score - 1); // Subtract 1 point (doesn't drop below 0)
+                b.innerText = "😭"; // Butterfly turns into crying emoji
+                p.innerText = "OH NO!"; // Floating impact text
+            } else {
+                score++;
+                p.innerText = words[Math.floor(Math.random()*words.length)];
+            }
+
+            document.getElementById('score').innerText = score;
+            
             p.style.left = wrapper.style.left;
             p.style.top = wrapper.style.top;
             document.getElementById('game-container').appendChild(p);
-            wrapper.remove();
+            
+            // Short delay so they can see the 😭 emoji before removing
+            setTimeout(() => {
+                wrapper.remove();
+            }, 150);
+
             done();
             setTimeout(() => p.remove(), 400);
         };
@@ -180,30 +205,34 @@
             if (t > window.innerHeight - 200) {
                 clearInterval(f);
                 if (!wrapper.dataset.hit) {
-                    guano += 10;
                     
-                    if (currentLevel === 2) {
-                        document.getElementById('health-ui').innerText = "GARDEN DAMAGE: " + guano + "%";
-                    } else {
-                        document.getElementById('health-ui').innerText = "GUANO LEVEL: " + guano + "%";
+                    // Butterflies falling off-screen DO NOT damage health!
+                    if (wrapper.dataset.butterfly !== "true") {
+                        guano += 10;
                         
-                        const poo = document.createElement('div');
-                        poo.className = 'poo';
-                        poo.style.left = (startX + 70) + 'px';
-                        poo.style.bottom = '160px';
-                        document.getElementById('game-container').appendChild(poo);
-                    }
-                    
-                    const mid = window.innerWidth / 2;
-                    let target = "m1";
-                    if (startX < mid - 100) target = "m0";
-                    if (startX > mid + 100 && document.getElementById("m2")) target = "m2";
-                    
-                    const mem = document.getElementById(target);
-                    if (mem) {
-                        const old = mem.innerHTML;
-                        mem.innerHTML = "<span>🤢</span>" + old.split('</span>')[1];
-                        setTimeout(() => { mem.innerHTML = old; }, 1000);
+                        if (currentLevel === 2) {
+                            document.getElementById('health-ui').innerText = "GARDEN DAMAGE: " + guano + "%";
+                        } else {
+                            document.getElementById('health-ui').innerText = "GUANO LEVEL: " + guano + "%";
+                            
+                            const poo = document.createElement('div');
+                            poo.className = 'poo';
+                            poo.style.left = (startX + 70) + 'px';
+                            poo.style.bottom = '160px';
+                            document.getElementById('game-container').appendChild(poo);
+                        }
+                        
+                        const mid = window.innerWidth / 2;
+                        let target = "m1";
+                        if (startX < mid - 100) target = "m0";
+                        if (startX > mid + 100 && document.getElementById("m2")) target = "m2";
+                        
+                        const mem = document.getElementById(target);
+                        if (mem) {
+                            const old = mem.innerHTML;
+                            mem.innerHTML = "<span>🤢</span>" + old.split('</span>')[1];
+                            setTimeout(() => { mem.innerHTML = old; }, 1000);
+                        }
                     }
 
                     wrapper.remove();
