@@ -69,7 +69,7 @@
     <h2 style="font-size: 1.5rem; margin-top: 0; color: #fff;">Poppy or Poopy?</h2>
     
     <div class="intro-text">
-        In 1985, a darkness fell over Sycamore Street in Carrollton Kentucky. A winged menace invaded the attic, and almost no one survived the terror... Until <b>Poppy</b> saved the day with a baseball bat and nerves of steel! Now, the bats are back, and scaping the attic. <b>How will you do?</b>
+        In 1985, a darkness fell over Sycamore Street in Carrollton Kentucky. A winged menace invaded the attic, and almost no one survived the terror... Until <b>Poppy</b> saved the day with a baseball bat and nerves of steel! Now, the bats are back, and escaping the attic. <b>How will you do?</b>
     </div>
     
     <p style="font-size: 1.3rem; color: #ffea00; margin-bottom: 10px;">Splat the Bats to save DeeDee and the boys!</p>
@@ -81,9 +81,9 @@
     <h2 id="res-score" style="font-size: 2.2rem; color: #ffea00;"></h2>
     <p id="res-msg" style="font-size: 1.4rem; margin-top: 10px; font-weight: bold;"></p>
     <button class="btn" onclick="location.reload()">REPLAY THE LEGEND</button>
-   <button id="nextLevelBtn" class="btn" style="display: none; margin: 10px auto;" onclick="startLevel2()">
-    🌻 ON TO LEVEL 2: PAPA'S GARDEN!
-</button>
+    <button id="nextLevelBtn" class="btn" style="display: none; margin: 10px auto;" onclick="startLevel2()">
+        🌻 ON TO LEVEL 2: PAPA'S GARDEN!
+    </button>
 </div>
 
 <div id="game-container">
@@ -215,34 +215,30 @@
         let rank = "";
         let msg = "";
         
-if (guano === 0) {
-    rank = "POPPY THE HERO";
-    msg = "Attic Legend! DeeDee, Jeff, and Brandon couldn't be more proud.";
-    document.getElementById("nextLevelBtn").style.display = "inline-block";
-} else if (guano <= 10) {
-    rank = "THE BAT SPLATTER";
-    "Sycamore is safe! Clean enough for government work!";
-    document.getElementById("nextLevelBtn").style.display = "block";
-} else {
-    rank = "IT'S GUANA GET BETTER NEXT TIME";
-    msg = "Someone grab the mop! Try Level 1 again.";
-    document.getElementById("nextLevelBtn").style.display = "none";
-}
+        // Unlocks Level 2 if you get 40 or more splats (score >= 40)
+        if (score === 50) {
+            rank = "POPPY THE HERO";
+            msg = "Attic Legend! DeeDee, Jeff, and Brandon couldn't be more proud.";
+            document.getElementById("nextLevelBtn").style.display = "block";
+        } else if (score >= 40) {
+            rank = "THE BAT SPLATTER";
+            msg = "Sycamore is safe! Clean enough for government work!";
+            document.getElementById("nextLevelBtn").style.display = "block";
+        } else {
+            rank = "IT'S GUANA GET BETTER NEXT TIME";
+            msg = "Someone grab the mop! Try Level 1 again.";
+            document.getElementById("nextLevelBtn").style.display = "none";
+        }
         
         document.getElementById('res-title').innerText = rank;
         document.getElementById('res-score').innerText = "Final Splats: " + score;
         document.getElementById('res-msg').innerText = msg;
     }
-   function startLevel2() {
-    // Hide the game over screen/modal
-    const gameOverScreen = document.querySelector('.game-over') || document.getElementById('modal');
-    if (gameOverScreen) {
-        gameOverScreen.style.display = 'none';
+
+    function startLevel2() {
+        document.getElementById('end-screen').style.display = 'none';
+        alert("Welcome to Level 2: Papa's Garden! DeeDee needs your help splatting garden pests!");
     }
-    
-    // Popup message for now
-    alert("Welcome to Level 2: Papa's Garden! DeeDee needs your help splatting garden pests!");
-}
 </script>
 </body>
 </html>
