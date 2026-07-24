@@ -134,14 +134,15 @@
     function create() {
         const wrapper = document.createElement('div');
         wrapper.className = 'bat-wrapper';
-       const b = document.createElement('div');
-if (currentLevel === 2) {
-    b.innerText = "🐛";
-    b.style.fontSize = "4.5rem";
-    b.style.userSelect = "none";
-} else {
-    b.className = 'enemy';
-}
+        
+        const b = document.createElement('div');
+        if (currentLevel === 2) {
+            b.innerText = "🐛";
+            b.style.fontSize = "4.5rem";
+            b.style.userSelect = "none";
+        } else {
+            b.className = 'enemy';
+        }
         
         let startX = Math.random() * (window.innerWidth - 160);
         wrapper.style.left = startX + 'px';
@@ -180,23 +181,30 @@ if (currentLevel === 2) {
                 clearInterval(f);
                 if (!wrapper.dataset.hit) {
                     guano += 10;
-                    document.getElementById('health-ui').innerText = "GUANO LEVEL: " + guano + "%";
                     
-                    const poo = document.createElement('div');
-                    poo.className = 'poo';
-                    poo.style.left = (startX + 70) + 'px';
-                    poo.style.bottom = '160px';
-                    document.getElementById('game-container').appendChild(poo);
+                    if (currentLevel === 2) {
+                        document.getElementById('health-ui').innerText = "GARDEN DAMAGE: " + guano + "%";
+                    } else {
+                        document.getElementById('health-ui').innerText = "GUANO LEVEL: " + guano + "%";
+                        
+                        const poo = document.createElement('div');
+                        poo.className = 'poo';
+                        poo.style.left = (startX + 70) + 'px';
+                        poo.style.bottom = '160px';
+                        document.getElementById('game-container').appendChild(poo);
+                    }
                     
                     const mid = window.innerWidth / 2;
                     let target = "m1";
                     if (startX < mid - 100) target = "m0";
-                    if (startX > mid + 100) target = "m2";
+                    if (startX > mid + 100 && document.getElementById("m2")) target = "m2";
                     
                     const mem = document.getElementById(target);
-                    const old = mem.innerHTML;
-                    mem.innerHTML = "<span>🤢</span>" + old.split('</span>')[1];
-                    setTimeout(() => { mem.innerHTML = old; }, 1000);
+                    if (mem) {
+                        const old = mem.innerHTML;
+                        mem.innerHTML = "<span>🤢</span>" + old.split('</span>')[1];
+                        setTimeout(() => { mem.innerHTML = old; }, 1000);
+                    }
 
                     wrapper.remove();
                     if (guano >= 100) over();
@@ -221,19 +229,32 @@ if (currentLevel === 2) {
         let rank = "";
         let msg = "";
         
-        // Unlocks Level 2 if you get 40 or more splats (score >= 40)
-        if (score === 50) {
-            rank = "POPPY THE HERO";
-            msg = "Attic Legend! DeeDee, Jeff, and Brandon couldn't be more proud.";
-            document.getElementById("nextLevelBtn").style.display = "block";
-        } else if (score >= 40) {
-            rank = "THE BAT SPLATTER";
-            msg = "Sycamore is safe! Clean enough for government work!";
-            document.getElementById("nextLevelBtn").style.display = "block";
-        } else {
-            rank = "IT'S GUANA GET BETTER NEXT TIME";
-            msg = "Someone grab the mop! Try Level 1 again.";
+        if (currentLevel === 2) {
+            if (score === 50) {
+                rank = "GARDEN MASTER";
+                msg = "Papa's tomatoes are saved! DeeDee and Papa John are thrilled!";
+            } else if (score >= 40) {
+                rank = "PEST SPLATTER";
+                msg = "Great job! The garden is safe for harvest!";
+            } else {
+                rank = "PEST TAKE OVER";
+                msg = "The caterpillars ate the garden! Try Level 2 again.";
+            }
             document.getElementById("nextLevelBtn").style.display = "none";
+        } else {
+            if (score === 50) {
+                rank = "POPPY THE HERO";
+                msg = "Attic Legend! DeeDee, Jeff, and Brandon couldn't be more proud.";
+                document.getElementById("nextLevelBtn").style.display = "block";
+            } else if (score >= 40) {
+                rank = "THE BAT SPLATTER";
+                msg = "Sycamore is safe! Clean enough for government work!";
+                document.getElementById("nextLevelBtn").style.display = "block";
+            } else {
+                rank = "IT'S GUANA GET BETTER NEXT TIME";
+                msg = "Someone grab the mop! Try Level 1 again.";
+                document.getElementById("nextLevelBtn").style.display = "none";
+            }
         }
         
         document.getElementById('res-title').innerText = rank;
@@ -241,38 +262,40 @@ if (currentLevel === 2) {
         document.getElementById('res-msg').innerText = msg;
     }
 
-function startLevel2() {
-    currentLevel = 2;
-    
-    // Hide victory screen
-    document.getElementById('end-screen').style.display = 'none';
-    
-    // Reset stats
-    score = 0;
-    guano = 0;
-    spawned = 0;
-    finished = 0;
-    active = true;
-    
-    // Update text & garden green background
-    document.getElementById('score').innerText = '0';
-    document.getElementById('health-ui').innerText = 'GARDEN DAMAGE: 0%';
-    document.body.style.background = '#1b4320';
-    
-    // Set DeeDee & Papa John with Sunflowers in the Garden!
-    const familyZone = document.getElementById('family-zone');
-    familyZone.innerHTML = `
-        <div class="member" id="m0"><span>👩</span>DeeDee</div>
-        <div style="font-size: 3rem;">🌻</div>
-        <div class="member" id="m1"><span>👴</span>Papa John</div>
-        <div style="font-size: 3rem;">🌻</div>
-    `;
-    
-    document.getElementById('game-container').style.display = 'block';
-    loop();
-}
-    document.getElementById('end-screen').style.display = 'none';
-        alert("Welcome to Level 2: Papa's Garden! DeeDee needs your help splatting garden pests!");
+    function startLevel2() {
+        currentLevel = 2;
+        
+        // Hide victory screen & show game screen
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        
+        // Clear any remaining bats or elements from screen
+        const oldWrappers = document.querySelectorAll('.bat-wrapper, .poo, .bam');
+        oldWrappers.forEach(el => el.remove());
+        
+        // Reset counters
+        score = 0;
+        guano = 0;
+        spawned = 0;
+        finished = 0;
+        active = true;
+        
+        // Update display text & garden green background
+        document.getElementById('score').innerText = '0';
+        document.getElementById('health-ui').innerText = 'GARDEN DAMAGE: 0%';
+        document.body.style.background = '#1b4320';
+        
+        // Set DeeDee & Papa John with Sunflowers in the Garden!
+        const familyZone = document.getElementById('family-zone');
+        familyZone.innerHTML = `
+            <div class="member" id="m0"><span>👩</span>DeeDee</div>
+            <div style="font-size: 3rem;">🌻</div>
+            <div class="member" id="m1"><span>👴</span>Papa John</div>
+            <div style="font-size: 3rem;">🌻</div>
+        `;
+        
+        // Restart game loop
+        loop();
     }
 </script>
 </body>
