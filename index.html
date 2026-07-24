@@ -134,8 +134,14 @@
     function create() {
         const wrapper = document.createElement('div');
         wrapper.className = 'bat-wrapper';
-        const b = document.createElement('div');
-        b.className = 'enemy';
+       const b = document.createElement('div');
+if (currentLevel === 2) {
+    b.innerText = "🐛";
+    b.style.fontSize = "4.5rem";
+    b.style.userSelect = "none";
+} else {
+    b.className = 'enemy';
+}
         
         let startX = Math.random() * (window.innerWidth - 160);
         wrapper.style.left = startX + 'px';
