@@ -241,8 +241,37 @@ if (currentLevel === 2) {
         document.getElementById('res-msg').innerText = msg;
     }
 
-    function startLevel2() {
-        document.getElementById('end-screen').style.display = 'none';
+function startLevel2() {
+    currentLevel = 2;
+    
+    // Hide victory screen
+    document.getElementById('end-screen').style.display = 'none';
+    
+    // Reset stats
+    score = 0;
+    guano = 0;
+    spawned = 0;
+    finished = 0;
+    active = true;
+    
+    // Update text & garden green background
+    document.getElementById('score').innerText = '0';
+    document.getElementById('health-ui').innerText = 'GARDEN DAMAGE: 0%';
+    document.body.style.background = '#1b4320';
+    
+    // Set DeeDee & Papa John with Sunflowers in the Garden!
+    const familyZone = document.getElementById('family-zone');
+    familyZone.innerHTML = `
+        <div class="member" id="m0"><span>👩</span>DeeDee</div>
+        <div style="font-size: 3rem;">🌻</div>
+        <div class="member" id="m1"><span>👴</span>Papa John</div>
+        <div style="font-size: 3rem;">🌻</div>
+    `;
+    
+    document.getElementById('game-container').style.display = 'block';
+    loop();
+}
+    document.getElementById('end-screen').style.display = 'none';
         alert("Welcome to Level 2: Papa's Garden! DeeDee needs your help splatting garden pests!");
     }
 </script>
