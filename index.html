@@ -58,6 +58,15 @@
         .btn { background: #ffea00; color: #000; padding: 20px 50px; font-size: 2rem; border-radius: 15px; border: none; cursor: pointer; font-weight: bold; margin-top: 20px; }
         
         .intro-text { font-size: 1.2rem; line-height: 1.6; max-width: 600px; margin: 20px auto; color: #ddd; font-family: sans-serif; }
+
+        /* Birthday Celebration Popup Style */
+        .hero-celebration {
+            display: flex; gap: 20px; align-items: center; justify-content: center;
+            margin: 15px 0; animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .hero-box { text-align: center; font-size: 1.2rem; }
+        .hero-box span { font-size: 4.5rem; display: block; }
+        @keyframes popUp { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -78,6 +87,14 @@
 
 <div id="end-screen" class="screen" style="display:none;">
     <h1 id="res-title" style="font-size: 3rem;"></h1>
+    
+    <!-- DeeDee & Papa John Birthday Feature -->
+    <div id="hero-display" class="hero-celebration" style="display:none;">
+        <div class="hero-box"><span>👩🎉</span><b>DEEDEE</b></div>
+        <div style="font-size: 3.5rem;">🌻</div>
+        <div class="hero-box"><span>👴🎉</span><b>PAPA JOHN</b></div>
+    </div>
+
     <h2 id="res-score" style="font-size: 2.2rem; color: #ffea00;"></h2>
     <p id="res-msg" style="font-size: 1.4rem; margin-top: 10px; font-weight: bold;"></p>
     <button class="btn" onclick="location.reload()">REPLAY THE LEGEND</button>
@@ -252,24 +269,24 @@
         active = false;
         document.getElementById('game-container').style.display = 'none';
         const screen = document.getElementById('end-screen');
+        const heroDisplay = document.getElementById('hero-display');
         screen.style.display = 'flex';
         
         let rank = "";
         let msg = "";
         
         if (currentLevel === 2) {
-            if (score === 50) {
-                rank = "GARDEN MASTER";
-                msg = "Papa's tomatoes are saved! DeeDee and Papa John are thrilled!";
-            } else if (score >= 40) {
-                rank = "PEST SPLATTER";
-                msg = "Great job! The garden is safe for harvest!";
+            heroDisplay.style.display = "flex"; // Show DeeDee & Papa John!
+            if (score >= 40) {
+                rank = "🎂 BIRTHDAY HERO DEEDEE! 🎂";
+                msg = "HAPPY BIRTHDAY DEEDEE! 🎉 You and Papa John saved the garden tomatoes!";
             } else {
-                rank = "PEST TAKE OVER";
-                msg = "The caterpillars ate the garden! Try Level 2 again.";
+                rank = "PEST TAKEOVER";
+                msg = "The caterpillars got the best of the garden! Give it another try for DeeDee's Birthday!";
             }
             document.getElementById("nextLevelBtn").style.display = "none";
         } else {
+            heroDisplay.style.display = "none";
             if (score === 50) {
                 rank = "POPPY THE HERO";
                 msg = "Attic Legend! DeeDee, Jeff, and Brandon couldn't be more proud.";
